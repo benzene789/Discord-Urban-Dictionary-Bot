@@ -1,8 +1,9 @@
 import requests
+import discord
+import json
 from discord.ext import commands
 
-
-def search_query(query):
+def search_query(querystring):
 
     url = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
 
@@ -22,8 +23,13 @@ bot = commands.Bot(command_prefix='=')
 @bot.command(name='search')
 async def search_dictionary(ctx, *, query):
     querystring = {"term": query}
-    result = search_query(querystring)
+    definition_list = json.loads(search_query(querystring))['list']
 
-    await ctx.send(result)
+    definition = definition_list[0]['definition']
+    example = definition_list[0]['example']
 
-    
+    await ctx.send("Definition of " + querystring + " :" + definition)
+    await ctx.send("Example of " + querystring + " :" + example)
+
+
+bot.run('MzU3NjI1MzQ3MDUyNjY2OTEw.XvZd2A.p_YNVvyw281Z5h_BYH1itjAPTuA')
