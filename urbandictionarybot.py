@@ -4,22 +4,11 @@ import json
 import aiohttp
 from discord.ext import commands
 
-def perform_request(url, querystring):
-    headers = {
-        'x-rapidapi-host': "mashape-community-urban-dictionary.p.rapidapi.com",
-        'x-rapidapi-key': "53d82afdb9msh5305c311469a516p173941jsna60a3ec2ae11"
-    }
-    response = requests.request(
-    "GET", url, headers=headers, params=querystring)
-
-    return response.text
-
-def search_query(querystring):
-
-    url = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
-
-    return perform_request(url, querystring)
-
+async def search_query(querystring):
+    async with aiohttp.ClientSession() as session:
+        data = await fetch(session, f'https://api.urbandictionary.com/v0/define?term={querystring}')
+        return data
+        
 async def fetch(session, url):
     async with session.get(url) as response:
         return await response.text()
@@ -33,14 +22,14 @@ bot = commands.Bot(command_prefix='=')
 
 @bot.command(name='search')
 async def search_dictionary(ctx, *, query):
-    querystring = {"term": query}
-    definition_list = json.loads(search_query(querystring))['list']
+    querystring = query
+    definition_list = json.loads(await search_query(querystring))['list']
 
     definition = definition_list[0]['definition']
     example = definition_list[0]['example']
 
-    await ctx.send("Definition of " + querystring['term'] + " :" + definition)
-    await ctx.send("Example of " + querystring['term'] + " :" + example)
+    await ctx.send("Definition of " + querystring + " :" + definition)
+    await ctx.send("Example of " + querystring + " :" + example)
 
 @bot.command(name='random')
 async def random(ctx):
@@ -48,7 +37,7 @@ async def random(ctx):
 
     definition = definition_list[0]['definition']
     example = definition_list[0]['example']
-    await ctx.send('/tts' +" WORD " +definition_list[0]['word'])
+    await ctx.send(" WORD " +definition_list[0]['word'])
     await ctx.send(definition)
     await ctx.send(example)
 
@@ -58,3 +47,4 @@ async def on_ready():
 
 
 bot.run('MzU3NjI1MzQ3MDUyNjY2OTEw.XvZd2A.p_YNVvyw281Z5h_BYH1itjAPTuA')
+
