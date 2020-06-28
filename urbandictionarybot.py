@@ -12,9 +12,6 @@ def perform_request(url, querystring):
     response = requests.request(
     "GET", url, headers=headers, params=querystring)
 
-
-    print(response.text)
-
     return response.text
 
 def search_query(querystring):
@@ -47,11 +44,11 @@ async def search_dictionary(ctx, *, query):
 
 @bot.command(name='random')
 async def random(ctx):
-    definition_list = json.loads(search_random_word())['list']
+    definition_list = json.loads(await search_random_word())['list']
 
     definition = definition_list[0]['definition']
     example = definition_list[0]['example']
-
+    await ctx.send('/tts' +" WORD " +definition_list[0]['word'])
     await ctx.send(definition)
     await ctx.send(example)
 
