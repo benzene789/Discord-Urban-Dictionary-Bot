@@ -8,12 +8,13 @@ from discord.ext import commands
 LIST = 'list'
 DEFINTION = 'definition'
 EXAMPLE = 'example'
-BASEURL = 'https://api.urbandictionary.com/v0/'
+BASE_URL = 'https://api.urbandictionary.com/v0/'
+BOT_TOKEN = 'MzU3NjI1MzQ3MDUyNjY2OTEw.XvZd2A.p_YNVvyw281Z5h_BYH1itjAPTuA'
 
 # Search a word the user types in
 async def search_query(querystring):
     async with aiohttp.ClientSession() as session:
-        data = await fetch(session, BASEURL+ f'define?term={querystring}')
+        data = await fetch(session, BASE_URL+ f'define?term={querystring}')
         return data
 
 # Fetch the URL
@@ -24,7 +25,7 @@ async def fetch(session, url):
 # Search up a random word
 async def search_random_word():
     async with aiohttp.ClientSession() as session:
-        data = await fetch(session, BASEURL+ 'random')
+        data = await fetch(session, BASE_URL+ 'random')
         return data
 
 # Create the bot
@@ -60,5 +61,5 @@ async def on_ready():
     print("Nonce Bot is ready")
 
 # Run the bot
-bot.run('MzU3NjI1MzQ3MDUyNjY2OTEw.XvZd2A.p_YNVvyw281Z5h_BYH1itjAPTuA')
+bot.run(BOT_TOKEN)
 
