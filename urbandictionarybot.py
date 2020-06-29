@@ -8,11 +8,12 @@ from discord.ext import commands
 LIST = 'list'
 DEFINTION = 'definition'
 EXAMPLE = 'example'
+BASEURL = 'https://api.urbandictionary.com/v0/'
 
 # Search a word the user types in
 async def search_query(querystring):
     async with aiohttp.ClientSession() as session:
-        data = await fetch(session, f'https://api.urbandictionary.com/v0/define?term={querystring}')
+        data = await fetch(session, BASEURL+ f'define?term={querystring}')
         return data
 
 # Fetch the URL
@@ -23,7 +24,7 @@ async def fetch(session, url):
 # Search up a random word
 async def search_random_word():
     async with aiohttp.ClientSession() as session:
-        data = await fetch(session, 'https://api.urbandictionary.com/v0/random')
+        data = await fetch(session, BASEURL+ 'random')
         return data
 
 # Create the bot
