@@ -42,7 +42,8 @@ async def search_dictionary(ctx, *, query):
 
     def check_reaction(reaction, user):
         return (str(reaction.emoji) == NEXT_DEFINITION
-        and reaction.message.id == message.id)
+        and reaction.message.id == message.id
+        and user.id != bot.user.id)
 
     # Gets the typed in query and parses it
     querystring = query
@@ -57,7 +58,7 @@ async def search_dictionary(ctx, *, query):
         definition = definition_list[counter][DEFINTION]
         example = definition_list[counter][EXAMPLE]
 
-        embed = discord.Embed(title=query, color=EMBED_COLOUR)
+        embed = discord.Embed(title="Defining...", color=EMBED_COLOUR)
 
         embed.add_field(name='Word', value= querystring)
         embed.add_field(name="Definition", value= definition)
@@ -73,7 +74,7 @@ async def search_dictionary(ctx, *, query):
         try:
             reaction, user = await bot.wait_for(
                 'reaction_add', check=check_reaction, timeout=60.0)
-            counter += 1
+            counter = (counter + 1) % len(definition_list)
         except asyncio.TimeoutError:
             await message.delete()
             break
