@@ -13,6 +13,7 @@ EXAMPLE = 'example'
 BASE_URL = 'https://api.urbandictionary.com/v0/'
 BOT_TOKEN = 'MzU3NjI1MzQ3MDUyNjY2OTEw.XvZd2A.p_YNVvyw281Z5h_BYH1itjAPTuA'
 NEXT_DEFINITION = '➡️'
+EMBED_COLOUR = 0xcf1e25
 
 
 # Search a word the user types in
@@ -47,20 +48,37 @@ async def search_dictionary(ctx, *, query):
     querystring = query
     definition_list = json.loads(await search_query(querystring))[LIST]
 
-    definition = definition_list[0][DEFINTION]
-    example = definition_list[0][EXAMPLE]
+    counter = 0
+    display = True
+    message = None
 
-    message = await ctx.send("Definition of " + querystring + " :" + definition + "\n" +
-    "Example of " + querystring + " :" + example)
-    # add emoji to message
-    await message.add_reaction(NEXT_DEFINITION)
-    
-    try:
-        reaction, _ = await bot.wait_for(
-            'reaction_add', check=check_reaction, timeout=60.0)
-    except asyncio.TimeoutError:
-        await message.delete()
-        return True
+    while display:
+
+        definition = definition_list[counter][DEFINTION]
+        example = definition_list[counter][EXAMPLE]
+
+        embed = discord.Embed(title=query, color=EMBED_COLOUR)
+
+        embed.add_field(name='Word', value= querystring)
+        embed.add_field(name="Definition", value= definition)
+        embed.add_field(name='Example', value= example)
+
+        if message is None:
+            message = await ctx.send(embed=embed)
+            # add emoji to message
+            await message.add_reaction(NEXT_DEFINITION)
+        else:
+            await message.edit(embed=embed)
+        
+        try:
+            reaction, user = await bot.wait_for(
+                'reaction_add', check=check_reaction, timeout=60.0)
+            counter += 1
+        except asyncio.TimeoutError:
+            await message.delete()
+            break
+        await reaction.remove(user)
+
 
 # Parse the random word and display here
 @bot.command(name='random')
