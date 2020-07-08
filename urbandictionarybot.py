@@ -1,7 +1,9 @@
-import requests
-import discord
 import json
+
+import asyncio
 import aiohttp
+import discord
+import requests
 from discord.ext import commands
 
 # Constants
@@ -10,6 +12,8 @@ DEFINTION = 'definition'
 EXAMPLE = 'example'
 BASE_URL = 'https://api.urbandictionary.com/v0/'
 BOT_TOKEN = 'MzU3NjI1MzQ3MDUyNjY2OTEw.XvZd2A.p_YNVvyw281Z5h_BYH1itjAPTuA'
+NEXT_DEFINITION = '➡️'
+
 
 # Search a word the user types in
 async def search_query(querystring):
@@ -34,6 +38,11 @@ bot = commands.Bot(command_prefix='=')
 # Parse the searched word and display here
 @bot.command(name='search')
 async def search_dictionary(ctx, *, query):
+
+    def check_reaction(reaction, user):
+        return (str(reaction.emoji) == NEXT_DEFINITION
+        and reaction.message.id == message.id)
+
     # Gets the typed in query and parses it
     querystring = query
     definition_list = json.loads(await search_query(querystring))[LIST]
@@ -41,8 +50,17 @@ async def search_dictionary(ctx, *, query):
     definition = definition_list[0][DEFINTION]
     example = definition_list[0][EXAMPLE]
 
-    await ctx.send("Definition of " + querystring + " :" + definition)
-    await ctx.send("Example of " + querystring + " :" + example)
+    message = await ctx.send("Definition of " + querystring + " :" + definition + "\n" +
+    "Example of " + querystring + " :" + example)
+    # add emoji to message
+    await message.add_reaction(NEXT_DEFINITION)
+    
+    try:
+        reaction, _ = await bot.wait_for(
+            'reaction_add', check=check_reaction, timeout=60.0)
+    except asyncio.TimeoutError:
+        await message.delete()
+        return True
 
 # Parse the random word and display here
 @bot.command(name='random')
@@ -51,7 +69,7 @@ async def random(ctx):
 
     definition = definition_list[0][DEFINTION]
     example = definition_list[0][EXAMPLE]
-    await ctx.send("Random word -> " +definition_list[0]['word'])
+    await ctx.send("Random word -> " +(definition_list[0]['word']))
     await ctx.send(definition)
     await ctx.send(example)
 
