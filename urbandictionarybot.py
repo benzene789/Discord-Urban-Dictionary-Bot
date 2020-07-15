@@ -15,7 +15,6 @@ BOT_TOKEN = 'MzU3NjI1MzQ3MDUyNjY2OTEw.XvZd2A.p_YNVvyw281Z5h_BYH1itjAPTuA'
 NEXT_DEFINITION = '➡️'
 EMBED_COLOUR = 0xcf1e25
 
-
 # Search a word the user types in
 async def search_query(querystring):
     async with aiohttp.ClientSession() as session:
@@ -90,7 +89,7 @@ async def random(ctx):
     definition_list = json.loads(await search_random_word())[LIST]
 
     await create_embed(definition_list, ctx)
-    
+
 # Check if the bot is running
 @bot.event
 async def on_ready():
