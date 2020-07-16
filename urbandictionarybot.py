@@ -3,7 +3,6 @@ import json
 import asyncio
 import aiohttp
 import discord
-import requests
 from discord.ext import commands
 
 # Constants
